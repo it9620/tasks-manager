@@ -96,3 +96,15 @@ What to need to install in sytem first:
     ```
 
 ---
+
+## Run builded service
+
+```sh
+# by command:
+./userver-samples-hello_service -c ../configs/static_config.yaml 
+
+# or by make <command>
+
+```
+
+---

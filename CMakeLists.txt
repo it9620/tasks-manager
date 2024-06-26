@@ -1,8 +1,5 @@
-cmake_minimum_required(VERSION 3.15)
-project(service_test CXX)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 3.14)
+project(userver-samples-hello_service CXX)
 
 ###################################################################################################
 # Fetch CPM if not already present
@@ -16,7 +13,6 @@ endif()
 # Add CPM / Include CPM
 #include(cmake/CPM.cmake)
 include("${CMAKE_BINARY_DIR}/cmake/CPM.cmake")
-
 
 ###################################################################################################
 # Set Protobuf and gRPC directories
@@ -44,33 +40,45 @@ CPMAddPackage(
     "USERVER_FEATURE_GRPC ON"
 )
 
-#add_subdirectory(third_party/userver)
-
-# Find userver package
-find_package(userver REQUIRED)
-
-#include_directories(${userver_INCLUDE_DIRS})
-
-include_directories(/tmp/userver)
-
 ###################################################################################################
-# Add your executable or library
-# add_executable(${PROJECT_NAME} src/main.cpp)
-
+# Adding userver dependency
+ 
+find_package(userver COMPONENTS core REQUIRED)
+# Note: If userver was added via add_subdirectory(path/to/userver), then
+# the userver_setup_environment() should be called here.
 userver_setup_environment()
 
-
-# Common sources
+# 
+ 
+# 
 add_library(${PROJECT_NAME}_objs OBJECT
-    src/hello.hpp
-    src/hello.cpp
+    src/say_hello.hpp
+    src/say_hello.cpp
+    src/hello_service.hpp
+    src/hello_service.cpp
 )
-target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::core)
-
-
-# The Service
+target_link_libraries(${PROJECT_NAME}_objs userver::core)
+target_include_directories(${PROJECT_NAME}_objs PUBLIC src)
+# 
+ 
+# 
 add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
-
-# Link userver library
-# target_link_libraries(${PROJECT_NAME} userver::grpc ${Protobuf_LIBRARIES} gRPC::grpc++ gRPC::grpc)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_objs)
+# 
+ 
+# 
+add_executable(${PROJECT_NAME}-unittest unittests/say_hello_test.cpp)
+target_link_libraries(${PROJECT_NAME}-unittest ${PROJECT_NAME}_objs userver::utest)
+add_google_tests(${PROJECT_NAME}-unittest)
+# 
+ 
+# 
+add_executable(${PROJECT_NAME}_benchmark benchmarks/say_hello_bench.cpp)
+target_link_libraries(${PROJECT_NAME}_benchmark ${PROJECT_NAME}_objs userver::ubench)
+add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
+# 
+ 
+# 
+# Makes a virtualenv suitable for running pytests from `test` directory and integrates with `ctest`.
+userver_testsuite_add_simple()
+# 

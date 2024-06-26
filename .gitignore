@@ -734,6 +734,7 @@ sprint3/problems/flamegraph/solution/graph.svg
 */**/build/
 */**/build-debug/
 */**/build-release/
+build-release/
 **/.pytest_cache/
 cpp-backend-tests-practicum
 .venv
