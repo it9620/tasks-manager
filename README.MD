@@ -100,6 +100,14 @@ What to need to install in sytem first:
 ## Run builded service
 
 ```sh
+mkdir build_debug && cd build_debug
+
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+# or 
+cmake -DCMAKE_BUILD_TYPE=Release ..
+
+cmake --build .
+
 # by command:
 ./userver-samples-hello_service -c ../configs/static_config.yaml 
 
